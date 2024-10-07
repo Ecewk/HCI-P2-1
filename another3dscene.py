@@ -3,6 +3,7 @@ import sys
 
 
 """
+This is pygame
 This is mostly for games and is not that good for what we are trying to do.
 """
 # Initialize Pygame

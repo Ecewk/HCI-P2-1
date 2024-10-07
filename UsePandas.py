@@ -1,6 +1,9 @@
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import Point3
-
+"""
+    This is Panda3D
+    Generally not bad but idk about the graphic quality feels like there are better options
+"""
 class MyApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)

@@ -1,6 +1,10 @@
 import numpy as np
 import open3d as o3d
 
+"""
+This is Open3D
+Generally its good and is a 3d scene library. 
+"""
 def generate_random_point_cloud(num_points=5000, num_shapes=1):
     # Initialize an empty list to store all points
     points = []

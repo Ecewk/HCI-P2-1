@@ -6,6 +6,7 @@ import mediapipe as mp
 import pyautogui
 
 """
+this is visPy
 THIS ONE IS MY FAVOURITE AND IS WORKING NICELY AND SMOOTHLY AND I MADE COPILOT ALSO IMPLEMENT EYETRACKING
 """
 # Vertex shader
@@ -95,6 +96,7 @@ class Canvas(app.Canvas):
 
     def on_timer(self, event):
         self.track_eye_movement()
+        
         self.model = np.array([
             [np.cos(self.theta_y), 0, np.sin(self.theta_y), 0],
             [np.sin(self.theta_x) * np.sin(self.theta_y), np.cos(self.theta_x), -np.sin(self.theta_x) * np.cos(self.theta_y), 0],
