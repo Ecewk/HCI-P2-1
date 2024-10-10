@@ -1,10 +1,17 @@
 import numpy as np
 import open3d as o3d
+import time
+import psutil
+import os
 
 """
 This is Open3D
 Generally its good and is a 3d scene library. 
 """
+
+# Measure startup time
+start_time = time.time()
+
 def generate_random_point_cloud(num_points=5000, num_shapes=1):
     # Initialize an empty list to store all points
     points = []
@@ -51,5 +58,52 @@ point_cloud = generate_random_point_cloud(10000, 8)
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(point_cloud)
 
-# Visualize the point cloud
-o3d.visualization.draw_geometries([pcd])
+# Initialize performance metrics
+process = psutil.Process(os.getpid())
+response_times = []
+memory_usages = []
+frame_count = 0
+start_time = time.time()
+
+# Function to measure performance
+def measure_performance():
+    global frame_count, start_time
+
+    frame_start_time = time.time()
+
+    # Measure memory usage
+    memory_usage = process.memory_info().rss / (1024 * 1024)  # in MB
+    memory_usages.append(memory_usage)
+
+    frame_count += 1
+
+    # Print metrics every second
+    if time.time() - start_time >= 1.0:
+        avg_response_time = sum(response_times) / len(response_times) if response_times else 0
+        avg_memory_usage = sum(memory_usages) / len(memory_usages) if memory_usages else 0
+        print(f"FPS: {frame_count}")
+        print(f"Average Response Time: {avg_response_time} seconds")
+        print(f"Average Memory Usage: {avg_memory_usage} MB")
+
+        # Reset metrics
+        response_times.clear()
+        memory_usages.clear()
+        frame_count = 0
+        start_time = time.time()
+
+    frame_end_time = time.time()
+    response_time = frame_end_time - frame_start_time
+    response_times.append(response_time)
+
+# Visualize the point cloud and measure performance
+vis = o3d.visualization.Visualizer()
+vis.create_window()
+vis.add_geometry(pcd)
+
+print(f"Startup Time: {time.time() - start_time} seconds")
+
+while vis.poll_events():
+    vis.update_renderer()
+    measure_performance()
+
+vis.destroy_window()

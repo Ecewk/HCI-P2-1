@@ -1,6 +1,6 @@
 import pygame
 import sys
-
+import os
 
 """
 This is pygame
@@ -16,8 +16,21 @@ pygame.display.set_caption("2D Parallax Example")
 
 # Load background images
 try:
-    background_far = pygame.image.load('background_far.png').convert()
-    background_near = pygame.image.load('background_near.png').convert()
+    background_far_path = 'layers/background_far.png'
+    background_near_path = 'layers/background_near.png'
+
+    # Check if files exist
+    if not os.path.exists(background_far_path):
+        print(f"Error: {background_far_path} does not exist.")
+        pygame.quit()
+        sys.exit()
+    if not os.path.exists(background_near_path):
+        print(f"Error: {background_near_path} does not exist.")
+        pygame.quit()
+        sys.exit()
+
+    background_far = pygame.image.load(background_far_path).convert()
+    background_near = pygame.image.load(background_near_path).convert()
 except pygame.error as e:
     print(f"Error loading images: {e}")
     pygame.quit()
@@ -52,7 +65,7 @@ while True:
         x_near = 0
 
     # Clear the screen
-    screen.fill((0, 0, 0))  # Fill with black to clear previous frames
+    #screen.fill((0, 0, 0))  # Fill with black to clear previous frames
 
     # Draw the far background
     screen.blit(background_far, (x_far, 0))

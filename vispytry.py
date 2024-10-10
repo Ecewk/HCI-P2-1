@@ -1,14 +1,17 @@
 import numpy as np
 from vispy import app, gloo
 from vispy.gloo import Program, VertexBuffer, IndexBuffer
-import cv2
-import mediapipe as mp
 import pyautogui
+import time
+import psutil
+import os
+import GPUtil
 
 """
 this is visPy
 THIS ONE IS MY FAVOURITE AND IS WORKING NICELY AND SMOOTHLY AND I MADE COPILOT ALSO IMPLEMENT EYETRACKING
 """
+
 # Vertex shader
 vertex_shader = """
 uniform mat4 model;
@@ -51,6 +54,9 @@ indices = np.array([
     [0, 3, 7], [0, 7, 4], [1, 2, 6], [1, 6, 5]
 ], dtype=np.uint32)
 
+# Measure startup time
+start_time = time.time()
+
 class Canvas(app.Canvas):
     def __init__(self):
         app.Canvas.__init__(self, keys='interactive')
@@ -69,13 +75,19 @@ class Canvas(app.Canvas):
 
         gloo.set_state(clear_color='black', depth_test=True)
         self.timer = app.Timer('auto', connect=self.on_timer, start=True)
+        self.fps_timer = app.Timer(1.0, connect=self.calculate_fps, start=True)
+        self.frame_count = 0
 
-        # Initialize eye-tracking components
-        self.cam = cv2.VideoCapture(0)
-        self.face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
-        self.screen_w, self.screen_h = pyautogui.size()
+        self.process = psutil.Process(os.getpid())
+
+        self.response_times = []
+        self.cpu_usages = []
+        self.memory_usages = []
+        self.gpu_usages = []
+        self.gpu_memory_usages = []
 
         self.show()
+        print(f"Startup Time: {time.time() - start_time} seconds")
 
     def on_resize(self, event):
         width, height = event.size
@@ -93,9 +105,11 @@ class Canvas(app.Canvas):
         self.program['view'] = self.view
         self.program['projection'] = self.projection
         self.program.draw('triangles', self.indices)
+        self.frame_count += 1
 
     def on_timer(self, event):
-        self.track_eye_movement()
+        start_time = time.time()
+        self.track_mouse_movement()
         
         self.model = np.array([
             [np.cos(self.theta_y), 0, np.sin(self.theta_y), 0],
@@ -104,40 +118,61 @@ class Canvas(app.Canvas):
             [0, 0, 0, 1]
         ], dtype=np.float32)
         self.update()
+        response_time = time.time() - start_time
+        self.response_times.append(response_time)
 
-    def track_eye_movement(self):
-        ret, frame = self.cam.read()
-        if not ret:
-            return
+        cpu_usage = self.process.cpu_percent(interval=None)
+        memory_usage = self.process.memory_info().rss / (1024 * 1024)  # in MB
+        self.cpu_usages.append(cpu_usage)
+        self.memory_usages.append(memory_usage)
 
-        frame = cv2.flip(frame, 1)
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        output = self.face_mesh.process(rgb_frame)
-        landmark_points = output.multi_face_landmarks
-        frame_h, frame_w, _ = frame.shape
+        gpus = GPUtil.getGPUs()
+        for gpu in gpus:
+            self.gpu_usages.append(gpu.load * 100)
+            self.gpu_memory_usages.append(gpu.memoryUsed)
 
-        if landmark_points:
-            landmarks = landmark_points[0].landmark
+    def track_mouse_movement(self):
+        mouse_x, mouse_y = pyautogui.position()
+        screen_w, screen_h = pyautogui.size()
 
-            for id, landmark in enumerate(landmarks[474:478]):
-                x = int(landmark.x * frame_w)
-                y = int(landmark.y * frame_h)
+        # Update rotation angles based on mouse position
+        self.theta_x = np.pi * (mouse_y / screen_h - 0.5)
+        self.theta_y = np.pi * (mouse_x / screen_w - 0.5)
 
-                if id == 1:
-                    screen_x = int(self.screen_w * landmark.x)
-                    screen_y = int(self.screen_h * landmark.y)
-                    pyautogui.moveTo(screen_x, screen_y)
+    def calculate_fps(self, event):
+        print(f"FPS: {self.frame_count}")
+        self.frame_count = 0
 
-            left_eye = [landmarks[145], landmarks[159]]
+        if self.response_times:
+            avg_response_time = sum(self.response_times) / len(self.response_times)
+            print(f"Average Response Time: {avg_response_time} seconds")
+            self.response_times = []
 
-            if (left_eye[0].y - left_eye[1].y) < 0.004:
-                pyautogui.mouseDown(button='left')
+        if self.cpu_usages:
+            avg_cpu_usage = sum(self.cpu_usages) / len(self.cpu_usages)
+            print(f"Average CPU Usage: {avg_cpu_usage}%")
+            self.cpu_usages = []
 
-            # Update rotation angles based on eye position
-            self.theta_x = np.pi * (landmarks[1].y - 0.5)
-            self.theta_y = np.pi * (landmarks[1].x - 0.5)
+        if self.memory_usages:
+            avg_memory_usage = sum(self.memory_usages) / len(self.memory_usages)
+            print(f"Average Memory Usage: {avg_memory_usage} MB")
+            self.memory_usages = []
+
+        if self.gpu_usages:
+            avg_gpu_usage = sum(self.gpu_usages) / len(self.gpu_usages)
+            print(f"Average GPU Usage: {avg_gpu_usage}%")
+            self.gpu_usages = []
+
+        if self.gpu_memory_usages:
+            avg_gpu_memory_usage = sum(self.gpu_memory_usages) / len(self.gpu_memory_usages)
+            print(f"Average GPU Memory Usage: {avg_gpu_memory_usage} MB")
+            self.gpu_memory_usages = []
 
 if __name__ == '__main__':
+    # Measure library size
+    vispy_path = os.path.dirname(app.__file__)
+    library_size = sum(os.path.getsize(os.path.join(dirpath, filename)) for dirpath, dirnames, filenames in os.walk(vispy_path) for filename in filenames)
+    print(f"Library Size: {library_size / (1024 * 1024)} MB")
+
     canvas = Canvas()
     app.run()
