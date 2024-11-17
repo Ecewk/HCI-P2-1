@@ -1,17 +1,19 @@
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+# Ignore common Unity folders
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
 
-# MemoryCaptures can get excessive in size.
-# They also could contain extremely sensitive data
-/[Mm]emoryCaptures/
+# Ignore Memory Captures (large and sensitive files)
+MemoryCaptures/
 
-# Asset meta data should only be ignored when the corresponding asset is also ignored
-!/[Aa]ssets/**/*.meta
+# Track asset meta data (important for Unity's asset system)
+!Assets/**/*.meta
 
-# Uncomment this line if you wish to ignore the asset store tools plugin
-# /[Aa]ssets/AssetStoreTools*
+# Ignore Asset Store Tools (optional)
+# Assets/AssetStoreTools*
+
+
