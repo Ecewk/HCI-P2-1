@@ -1,0 +1,19 @@
+# Ignore common Unity folders
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+
+# Ignore Memory Captures (large and sensitive files)
+MemoryCaptures/
+
+# Track asset meta data (important for Unity's asset system)
+!Assets/**/*.meta
+
+# Ignore Asset Store Tools (optional)
+# Assets/AssetStoreTools*
+
+
