@@ -65,8 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BoidSettings.cs" />
+    <Compile Include="Assets\Scripts\MyListener.cs" />
     <Compile Include="Assets\Scripts\Boid.cs" />
     <Compile Include="Assets\Scripts\BoidManager.cs" />
+    <Compile Include="Assets\Scripts\SC_FPSController.cs" />
     <Compile Include="Assets\Assets\MyListener.cs" />
     <Compile Include="Assets\Scripts\Spawner.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
@@ -74,6 +76,8 @@
     <Compile Include="Assets\IgniteCoders\Simple Water Shader\Resources\WaterReflection.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Fantasy Forest Environment Free Sample\StandardNoCulling.shader" />
+    <None Include="Assets\Stylized Ocean Materials\Shader\Water_Ocean_03.shader" />
     <None Include="Assets\Scripts\BoidCompute.compute" />
   </ItemGroup>
   <ItemGroup>
