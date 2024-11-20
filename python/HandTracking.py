@@ -1,6 +1,5 @@
 import time
 import cv2
-from event import post_event
 import mediapipe as mp
 from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import GestureRecognizer
@@ -28,7 +27,7 @@ def change_hand(hand, gesture):
 
 # "Thumb_Up", "Open_Palm", "Closed_Fist", "Pointing_Up", "Victory", "Thumb_Down", "ILoveYou"
 def send_scene_change(scene):
-    post_event("scene_change", scene)
+    "yey"
 
 #[[Category(index=-1, score=0.7852272391319275, display_name='', category_name='Open_Palm')]] <- gestures
 #[[Category(index=0, score=0.9727259278297424, display_name='Right', category_name='Right')]] <- handedness

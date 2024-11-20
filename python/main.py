@@ -1,6 +1,7 @@
 import cv2
 import socket
 from handTracker import handTrackerClass
+from eyeTracker import eyeTrackerClass
 
 
 if __name__ == "__main__":    
@@ -12,6 +13,7 @@ if __name__ == "__main__":
 
     print("Start up hand tracking")
     myHandtracker = handTrackerClass(sock)
+    myEyetracker = eyeTrackerClass(sock)
 
     try:
         # Connect to the server
@@ -24,6 +26,7 @@ if __name__ == "__main__":
                 break
 
             myHandtracker.recog_gestures(img)
+            #myEyetracker.send_eyes_position(img)
 
             img = cv2.flip(img, 1)
             #cv2.imshow("Image", img)

@@ -2,3 +2,5 @@
 .DS_Store 
 
 oldMain.py
+
+__pycache__
