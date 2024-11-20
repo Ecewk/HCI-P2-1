@@ -58,7 +58,8 @@ public class MyListener : MonoBehaviour
         if (!string.IsNullOrEmpty(dataReceived))
         {
             // Convert the received string of data to the format we are using
-            position = ParseData(dataReceived);
+            Debug.Log(dataReceived);
+            scene = dataReceived;
             nwStream.Write(buffer, 0, bytesRead);
         }
     }
@@ -80,7 +81,7 @@ public class MyListener : MonoBehaviour
     }
 
     // Position is the data being received in this example
-    Vector3 position = Vector3.zero;
+    string scene = "";
 
     void Update()
     {
