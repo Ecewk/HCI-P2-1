@@ -7,6 +7,11 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using UnityEngine;
+using System.Threading;
 
 [RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
@@ -14,36 +19,84 @@ public class AsymFrustum : MonoBehaviour
 {
 
     public GameObject virtualWindow;
-
-    /// <summary>
+     //the cameraholder tagged object, which will be the one to be moved
+    public GameObject cameraHolder;
     /// Screen/window to virtual world width (in units. I suggest using meters)
-    /// </summary>
     public float width;
-    /// <summary>
 	/// Screen/window to virtual world height (in units. I suggest using meters)
-    /// </summary>
     public float height;
-    /// <summary>
 	/// The maximum height the camera can have (up axis in local coordinates from  the virtualWindow) (in units. I suggest using meters)
-    /// </summary>
     public float maxHeight = 2000.0f;
     float windowWidth;
     float windowHeight;
-
-
-
+    Thread thread;
+    public int connectionPort = 25001;
+    TcpListener server;
+    TcpClient client;
+    bool running;
+    Vector3 newPosition;
+    bool positionUpdated = false;
     public bool verbose = false;
 
-    /// <summary>
+
     /// Called when this Component gets initialized
-    /// </summary>
     void Start()
     {
+        StartServer();
     }
 
-    /// <summary>
+    void StartServer()
+    {
+        thread = new Thread(new ThreadStart(ListenForClients));
+        thread.IsBackground = true;
+        thread.Start();
+    }
+
+    void ListenForClients()
+    {
+        server = new TcpListener(System.Net.IPAddress.Any, connectionPort);
+        server.Start();
+        running = true;
+
+        while (running)
+        {
+            client = server.AcceptTcpClient();
+            NetworkStream stream = client.GetStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                string data = System.Text.Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                Vector3 position = ParseData(data);
+                lock(this)
+                {
+                    newPosition = position;
+                    positionUpdated = true;
+                }
+            }
+        }
+    }
+
+    Vector3 ParseData(string data)
+    {
+        string[] parts = data.Split(',');
+        if (parts.Length == 3)
+        {
+            float x = float.Parse(parts[0]);
+            float y = float.Parse(parts[1]);
+            float z = float.Parse(parts[2]);
+            return new Vector3(x, y, z);
+        }
+        return Vector3.zero;
+    }
+
+    void UpdateCameraPosition(Vector3 position)
+        {
+            transform.position = position;
+        }
+
     /// Late Update. Hopefully by now the head position got updated by whatever you use as input here.
-    /// </summary>
     void LateUpdate()
     {
         windowWidth = width;
