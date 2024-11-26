@@ -7,13 +7,16 @@ host, port = "127.0.0.1", 25001
 
 # Initialize the TCP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+cap = None
 try:
     # Connect to the server
     sock.connect((host, port))
 
     # Start capturing video from the webcam
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        raise Exception("Could not open video device")
+
 
     # Load pre-trained classifier for detecting eyes
     eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
@@ -76,17 +79,12 @@ try:
 
             # Invert Y coordinate
             inverted_y = 700 - smoothed_y
-            
-            #print("X,Y: ", last_x, " ", last_y)
-            #print("Smoothed X,Y: ", smoothed_x," ", smoothed_y)
-            #average_x = sum(center[0] for center in eye_centers) // len(eye_centers)
-            #average_y = sum(center[1] for center in eye_centers) // len(eye_centers)
-            #print("Average X,Y: ", average_x, " ", average_y)
 
             # Send the smoothed coordinates to the server at a fixed interval
             if time.time() - last_send_time > send_interval:
                 try:
-                    data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
+                    data = f"{smoothed_x},{inverted_y},{0}"#z_value}"  # Include z value
+                    #print(data)
                     sock.sendall(data.encode("utf-8"))
                     last_send_time = time.time()
                 except socket.error:
@@ -102,51 +100,7 @@ try:
 
 finally:
     # Release resources
-    cap.release()
+    if cap is not None and cap.isOpened():
+        cap.release()
     cv2.destroyAllWindows()
     sock.close()
-
-
-
-
-# import cv2
-# import socket
-# from handTracker import handTrackerClass
-# from eyeTracker import eyeTrackerClass
-
-
-# if __name__ == "__main__":    
-#     # Host and port for the TCP connection
-#     host, port = "127.0.0.1", 25001
-
-#     # Initialize the TCP socket
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-#     print("Start up hand tracking")
-#     myHandtracker = handTrackerClass(sock)
-#     myEyetracker = eyeTrackerClass(sock)
-
-#     try:
-#         # Connect to the server
-#         sock.connect((host, port))
-
-#         cap = cv2.VideoCapture(0)
-#         while True:
-#             ret, img = cap.read()
-#             if not ret:
-#                 break
-
-#             myHandtracker.recog_gestures(img)
-#             #myEyetracker.send_eyes_position(img)
-
-#             img = cv2.flip(img, 1)
-#             #cv2.imshow("Image", img)
-#             if cv2.waitKey(1) & 0xFF == ord('q'):
-#                 break
-    
-#     except socket.error:
-#         print("Start unity project")
-
-#     finally:
-#         # Release resources
-#         sock.close()

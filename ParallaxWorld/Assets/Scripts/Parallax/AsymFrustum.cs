@@ -19,9 +19,8 @@ public class AsymFrustum : MonoBehaviour
 {
 
     public GameObject virtualWindow;
-     //the cameraholder tagged object, which will be the one to be moved
-    public GameObject cameraHolder;
     /// Screen/window to virtual world width (in units. I suggest using meters)
+    public GameObject CameraHolder;
     public float width;
 	/// Screen/window to virtual world height (in units. I suggest using meters)
     public float height;
@@ -37,11 +36,19 @@ public class AsymFrustum : MonoBehaviour
     Vector3 newPosition;
     bool positionUpdated = false;
     public bool verbose = false;
+    public Vector3 currentUserPos;
+    public Vector3 lastUserPos;
+    public Vector3 currentCameraPos;
+    public Vector3 lastCameraPos;
 
 
     /// Called when this Component gets initialized
     void Start()
     {
+        currentCameraPos = transform.position;
+        lastCameraPos = currentCameraPos;
+        currentUserPos = new Vector3(300.96f, 450.44f, 0f);
+        lastUserPos = currentUserPos;
         StartServer();
     }
 
@@ -71,7 +78,7 @@ public class AsymFrustum : MonoBehaviour
                 Vector3 position = ParseData(data);
                 lock(this)
                 {
-                    newPosition = position;
+                    currentUserPos = position;
                     positionUpdated = true;
                 }
             }
@@ -84,7 +91,7 @@ public class AsymFrustum : MonoBehaviour
         if (parts.Length == 3)
         {
             float x = float.Parse(parts[0]);
-            float y = float.Parse(parts[1]);
+            float y = -float.Parse(parts[1]); //inverted y axis
             float z = float.Parse(parts[2]);
             return new Vector3(x, y, z);
         }
@@ -101,7 +108,21 @@ public class AsymFrustum : MonoBehaviour
     {
         windowWidth = width;
         windowHeight = height;
+    // position changed
+    if (positionUpdated)
+    {
+        lock (this)
+        {
+            Vector3 UserMovement = currentUserPos - lastUserPos;
+            currentCameraPos = lastCameraPos + UserMovement;
+            transform.position = currentCameraPos; 
 
+            lastUserPos = currentUserPos; 
+            lastCameraPos = currentCameraPos;
+
+            positionUpdated = false; 
+        }
+    }
         // gets the local position of this camera depending on the virtual screen
         Vector3 localPos = virtualWindow.transform.InverseTransformPoint(transform.position);
 
