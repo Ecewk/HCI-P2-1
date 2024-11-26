@@ -36,6 +36,7 @@ public class AsymFrustum : MonoBehaviour
     Vector3 newPosition;
     bool positionUpdated = false;
     public bool verbose = false;
+    public bool isInitialized = false;
     public Vector3 currentUserPos;
     public Vector3 lastUserPos;
     public Vector3 currentCameraPos;
@@ -47,8 +48,8 @@ public class AsymFrustum : MonoBehaviour
     {
         currentCameraPos = transform.position;
         lastCameraPos = currentCameraPos;
-        currentUserPos = new Vector3(300.96f, 450.44f, 0f);
-        lastUserPos = currentUserPos;
+        //currentUserPos = Vector3.zero;
+        //lastUserPos = currentUserPos;
         StartServer();
     }
 
@@ -93,6 +94,14 @@ public class AsymFrustum : MonoBehaviour
             float x = float.Parse(parts[0]);
             float y = -float.Parse(parts[1]); //inverted y axis
             float z = float.Parse(parts[2]);
+
+            if(!isInitialized)
+            {
+                currentUserPos = new Vector3(x, y, z);
+                lastUserPos = currentUserPos;
+                isInitialized = true;
+                return currentUserPos;
+            }
             return new Vector3(x, y, z);
         }
         return Vector3.zero;
@@ -109,11 +118,12 @@ public class AsymFrustum : MonoBehaviour
         windowWidth = width;
         windowHeight = height;
     // position changed
-    if (positionUpdated)
+    if (positionUpdated && isInitialized)
     {
         lock (this)
         {
             Vector3 UserMovement = currentUserPos - lastUserPos;
+            UserMovement *= 0.1f; // dampen the movement a bit
             currentCameraPos = lastCameraPos + UserMovement;
             transform.position = currentCameraPos; 
 
