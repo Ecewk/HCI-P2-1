@@ -17,7 +17,7 @@ class eyeTrackerClass:
         global thissock
         thissock = sock
     
-    def send_eyes_position(self, img):
+    def send_eyes_position(self, frame):
         # Flip the frame horizontally to mirror it
         frame = cv2.flip(frame, 1)
 
@@ -66,11 +66,11 @@ class eyeTrackerClass:
             inverted_y = 700 - smoothed_y
 
             # Send the smoothed coordinates to the server at a fixed interval
-            if time.time() - last_send_time > self.send_interval:
+            if time.time() - self.last_send_time > self.send_interval:
                 try:
                     data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
-                    self.sock.sendall(data.encode("utf-8"))
-                    last_send_time = time.time()
+                    thissock.sendall(data.encode("utf-8"))
+                    self.last_send_time = time.time()
                 except socket.error:
                     print("Connection lost. Exiting...")
                     

@@ -3,7 +3,6 @@ import socket
 from handTracker import handTrackerClass
 from eyeTracker import eyeTrackerClass
 
-
 if __name__ == "__main__":    
     # Host and port for the TCP connection
     host, port = "127.0.0.1", 25001
@@ -26,7 +25,7 @@ if __name__ == "__main__":
                 break
 
             myHandtracker.recog_gestures(img)
-            #myEyetracker.send_eyes_position(img)
+            myEyetracker.send_eyes_position(img)
 
             img = cv2.flip(img, 1)
             #cv2.imshow("Image", img)
