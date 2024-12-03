@@ -16,11 +16,8 @@ global thissock
 
 def send_scene(scene):
     global thissock
-    try:
-        data = scene
-        thissock.sendall(data.encode("utf-8"))
-    except socket.error:
-        print("Connection lost. Exiting...")
+    data = scene
+    thissock.sendto(data.encode("utf-8"), ("127.0.0.1", 25001))
 
 
 def change_hand(hand, gesture):
