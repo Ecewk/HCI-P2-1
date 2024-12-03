@@ -42,16 +42,17 @@ public class CameraScript : MonoBehaviour
     public Vector3 lastUserPos;
     public Vector3 currentCameraPos;
     public Vector3 lastCameraPos;
+
     public string SceneName = "";
 
     /// Called when this Component gets initialized
     void Start()
     {
-        FinalJungle.SetActive(false);
-        FinalMain.SetActive(true);
-        FinalWater.SetActive(false);
+        //virtualWindow.transform.position = new Vector3(transform.position.x, 0, transform.position.z);
 
         currentCameraPos = transform.position;
+        //virtualWindow.transform.position = new Vector3(0, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+
         lastCameraPos = currentCameraPos;
         //currentUserPos = Vector3.zero;
         //lastUserPos = currentUserPos;
@@ -124,23 +125,35 @@ public class CameraScript : MonoBehaviour
     void Update()
     {
         if ((Input.GetKeyDown(KeyCode.A) || SceneName == "jungle") && (FinalMain.activeSelf)) {
-            FinalJungle.SetActive(true);
-            FinalMain.SetActive(false);
-            FinalWater.SetActive(false);
+            // FinalJungle.SetActive(true);
+            // FinalMain.SetActive(false);
+            // FinalWater.SetActive(false);
+            virtualWindow.transform.position = new Vector3(-300, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+            currentCameraPos = new Vector3(-2, 3, 11);
+            lastCameraPos = currentCameraPos;
+            transform.localPosition = currentCameraPos; 
 
             Debug.Log($"Current scene: jungle");
         }
         else if ((Input.GetKeyDown(KeyCode.D) || SceneName == "water") && (FinalMain.activeSelf)) {
-            FinalJungle.SetActive(false);
-            FinalMain.SetActive(false);
-            FinalWater.SetActive(true);
-            
+            // FinalJungle.SetActive(false);
+            // FinalMain.SetActive(false);
+            // FinalWater.SetActive(true);
+            virtualWindow.transform.position = new Vector3(300, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+            currentCameraPos = new Vector3(-2, 3, 11);
+            lastCameraPos = currentCameraPos;
+            transform.localPosition = currentCameraPos; 
+
             Debug.Log($"Current scene: water");
         }
         else if ((Input.GetKeyDown(KeyCode.W) || SceneName == "main") && (FinalWater.activeSelf || FinalJungle.activeSelf)) {
-            FinalJungle.SetActive(false);
-            FinalMain.SetActive(true);
-            FinalWater.SetActive(false);
+            // FinalJungle.SetActive(false);
+            // FinalMain.SetActive(true);
+            // FinalWater.SetActive(false);
+            virtualWindow.transform.position = new Vector3(0, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+            currentCameraPos = new Vector3(-2, 3, 11);
+            lastCameraPos = currentCameraPos;
+            transform.localPosition = currentCameraPos; 
 
             Debug.Log($"Current scene: main");
 	    }
