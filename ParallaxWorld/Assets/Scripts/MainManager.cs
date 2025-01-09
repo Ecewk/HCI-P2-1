@@ -110,23 +110,24 @@ public class MainManager : MonoBehaviour
     {
         if ((Input.GetKeyDown(KeyCode.W) || SceneName == "main") && (SceneManager.GetActiveScene().name == "FinalJungle" || SceneManager.GetActiveScene().name == "FinalWater")) {
             SceneManager.LoadScene("FinalMain");
-            //TODO fix target and cam referencing
-            target = GameObject.Find("mainTarget");
-            cam = Camera.main;
+            target.transform.position = new Vector3(1.49999976F,21.2399998F,49.7000008F);
         }
         if ((Input.GetKeyDown(KeyCode.A) || SceneName == "jungle") && (SceneManager.GetActiveScene().name == "FinalMain")) {
             SceneManager.LoadScene("FinalJungle");
-            target = GameObject.Find("jungleTarget");
-            cam = Camera.main;
+            target.transform.position = new Vector3(-0.300000191F,24.5400028F,117F);
         }
         if ((Input.GetKeyDown(KeyCode.D) || SceneName == "water") && (SceneManager.GetActiveScene().name == "FinalMain")) {
             SceneManager.LoadScene("FinalWater");
-            target = GameObject.Find("waterTarget");
-            cam = Camera.main;
+            target.transform.position = new Vector3(23.810009F,14.1315308F,-66.5497284F);
         }
 
         float speed = 0.5F;
-        cam.transform.RotateAround(target.transform.position, cam.transform.right, -Input.GetAxis("Mouse Y") * speed);
-        cam.transform.RotateAround(target.transform.position, cam.transform.up, -Input.GetAxis("Mouse X") * speed);
+        //cam.transform.RotateAround(target.transform.position, cam.transform.right, -Input.GetAxis("Mouse Y") * speed);
+        //cam.transform.RotateAround(target.transform.position, cam.transform.up, -Input.GetAxis("Mouse X") * speed);
+        Debug.Log("Y     " + (currentUserPos.y - lastUserPos.y));
+        Debug.Log("X   " + (currentUserPos.x - lastUserPos.x));
+        cam.transform.RotateAround(target.transform.position, cam.transform.right, (currentUserPos.y - lastUserPos.y)/10 * speed);
+        cam.transform.RotateAround(target.transform.position, cam.transform.up, -(currentUserPos.x - lastUserPos.x)/10 * speed);
+        lastUserPos = currentUserPos; 
     }
 }
