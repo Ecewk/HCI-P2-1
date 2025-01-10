@@ -16,11 +16,8 @@ global thissock
 
 def send_scene(scene):
     global thissock
-    try:
-        data = scene
-        thissock.sendall(data.encode("utf-8"))
-    except socket.error:
-        print("Connection lost. Exiting...")
+    data = scene
+    thissock.sendto(data.encode("utf-8"), ("127.0.0.1", 25001))
 
 
 def change_hand(hand, gesture):
@@ -48,14 +45,16 @@ def handle_result(result, output_image: mp.Image, timestamp_ms: int):
         change_hand(1, "")
         change_hand(0, "")
     else:
-        if result.handedness[0][0].category_name == "Left" and result.gestures[0][0].category_name != "None":
-            change_hand(1, result.gestures[0][0].category_name)
-        elif result.handedness[0][0].category_name == "Right" and result.gestures[0][0].category_name != "None":
-            change_hand(0, result.gestures[0][0].category_name)
+        for index in range(len(result.handedness)):
+            if result.handedness[index][0].category_name == "Left" and result.gestures[index][0].category_name != "None":
+                change_hand(1, result.gestures[index][0].category_name)
+            elif result.handedness[index][0].category_name == "Right" and result.gestures[index][0].category_name != "None":
+                change_hand(0, result.gestures[index][0].category_name)
 
 options = GestureRecognizerOptions(
 base_options=BaseOptions(model_asset_path="gesture_recognizer.task"),
 running_mode=RunningMode.LIVE_STREAM,
+num_hands=2,
 result_callback=handle_result)
 recognizer = GestureRecognizer.create_from_options(options)
 

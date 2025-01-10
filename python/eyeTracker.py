@@ -12,7 +12,7 @@ class eyeTrackerClass:
         # Initialize variables for smoothing
         self.last_x, self.last_y = 0, 0
         self.alpha = 0.2  # Smoothing factor
-        self.send_interval = 0.1  # Time interval to send data (in seconds)
+        self.send_interval = 0.2  # Time interval to send data (in seconds)
         self.last_send_time = time.time()
         global thissock
         thissock = sock
@@ -67,10 +67,7 @@ class eyeTrackerClass:
 
             # Send the smoothed coordinates to the server at a fixed interval
             if time.time() - self.last_send_time > self.send_interval:
-                try:
-                    data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
-                    thissock.sendall(data.encode("utf-8"))
-                    self.last_send_time = time.time()
-                except socket.error:
-                    print("Connection lost. Exiting...")
+                data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
+                thissock.sendto(data.encode("utf-8"), ("127.0.0.1", 25001))
+                self.last_send_time = time.time()
                     

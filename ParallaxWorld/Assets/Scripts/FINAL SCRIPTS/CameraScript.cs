@@ -4,7 +4,6 @@
 /// based on http://paulbourke.net/stereographics/stereorender/
 /// and http://answers.unity3d.com/questions/165443/asymmetric-view-frusta-selective-region-rendering.html
 /// </summary>
-using UnityEngine;
 using System.Collections;
 using System;
 using System.Net;
@@ -12,15 +11,18 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 using System.Threading;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
-public class AsymFrustum : MonoBehaviour
+public class CameraScript : MonoBehaviour
 {
 
     public GameObject virtualWindow;
+    public GameObject FinalWater;
+    public GameObject FinalMain;
+    public GameObject FinalJungle;
     /// Screen/window to virtual world width (in units. I suggest using meters)
-    public GameObject CameraHolder;
     public float width;
 	/// Screen/window to virtual world height (in units. I suggest using meters)
     public float height;
@@ -29,10 +31,9 @@ public class AsymFrustum : MonoBehaviour
     float windowWidth;
     float windowHeight;
     Thread thread;
-    public int connectionPort = 25001;
-    TcpListener server;
-    TcpClient client;
-    bool running;
+    public int port = 25001;
+    private UdpClient udpServer;
+    private IPEndPoint remoteEndPoint;
     Vector3 newPosition;
     bool positionUpdated = false;
     public bool verbose = false;
@@ -42,11 +43,16 @@ public class AsymFrustum : MonoBehaviour
     public Vector3 currentCameraPos;
     public Vector3 lastCameraPos;
 
+    public string SceneName = "";
 
     /// Called when this Component gets initialized
     void Start()
     {
+        //virtualWindow.transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+
         currentCameraPos = transform.position;
+        //virtualWindow.transform.position = new Vector3(0, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+
         lastCameraPos = currentCameraPos;
         //currentUserPos = Vector3.zero;
         //lastUserPos = currentUserPos;
@@ -55,36 +61,45 @@ public class AsymFrustum : MonoBehaviour
 
     void StartServer()
     {
-        thread = new Thread(new ThreadStart(ListenForClients));
+        thread = new Thread(new ThreadStart(StartUDPServer));
         thread.IsBackground = true;
         thread.Start();
     }
 
-    void ListenForClients()
+    private void StartUDPServer()
     {
-        server = new TcpListener(System.Net.IPAddress.Any, connectionPort);
-        server.Start();
-        running = true;
+        udpServer = new UdpClient(port);
+        remoteEndPoint = new IPEndPoint(IPAddress.Any, port);
 
-        while (running)
-        {
-            client = server.AcceptTcpClient();
-            NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead;
+        Debug.Log("Server started. Waiting for messages...");
 
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
-            {
-                string data = System.Text.Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                Vector3 position = ParseData(data);
-                lock(this)
-                {
-                    currentUserPos = position;
-                    positionUpdated = true;
-                }
-            }
-        }
+        // Start receiving data asynchronously
+        udpServer.BeginReceive(ReceiveData, null);
     }
+
+    private void ReceiveData(IAsyncResult result)
+    {
+        byte[] receivedBytes = udpServer.EndReceive(result, ref remoteEndPoint);
+        string receivedMessage = System.Text.Encoding.UTF8.GetString(receivedBytes);
+
+        Debug.Log("Received from client: " + receivedMessage);
+
+        // Process the received data
+        if (receivedMessage.Contains(",")) {
+            Vector3 position = ParseData(receivedMessage);
+            lock(this)
+            {
+                currentUserPos = position;
+                positionUpdated = true;
+            }
+        } else {
+            SceneName = receivedMessage;
+        }
+
+
+        // Continue receiving data asynchronously
+        udpServer.BeginReceive(ReceiveData, null);
+    } 
 
     Vector3 ParseData(string data)
     {
@@ -92,7 +107,7 @@ public class AsymFrustum : MonoBehaviour
         if (parts.Length == 3)
         {
             float x = float.Parse(parts[0]);
-            float y = -float.Parse(parts[1]); //inverted y axis
+            float y = float.Parse(parts[1]); //inverted y axis
             float z = float.Parse(parts[2]);
 
             if(!isInitialized)
@@ -107,38 +122,75 @@ public class AsymFrustum : MonoBehaviour
         return Vector3.zero;
     }
 
-    void UpdateCameraPosition(Vector3 position)
-        {
-            transform.position = position;
+    void Update()
+    {
+        if ((Input.GetKeyDown(KeyCode.A) || SceneName == "jungle") && (FinalMain.activeSelf)) {
+            // FinalJungle.SetActive(true);
+            // FinalMain.SetActive(false);
+            // FinalWater.SetActive(false);
+            virtualWindow.transform.position = new Vector3(-300, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+            currentCameraPos = new Vector3(-2, 3, 11);
+            lastCameraPos = currentCameraPos;
+            transform.localPosition = currentCameraPos; 
+
+            Debug.Log($"Current scene: jungle");
         }
+        else if ((Input.GetKeyDown(KeyCode.D) || SceneName == "water") && (FinalMain.activeSelf)) {
+            // FinalJungle.SetActive(false);
+            // FinalMain.SetActive(false);
+            // FinalWater.SetActive(true);
+            virtualWindow.transform.position = new Vector3(300, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+            currentCameraPos = new Vector3(-2, 3, 11);
+            lastCameraPos = currentCameraPos;
+            transform.localPosition = currentCameraPos; 
+
+            Debug.Log($"Current scene: water");
+        }
+        else if ((Input.GetKeyDown(KeyCode.W) || SceneName == "main") && (FinalWater.activeSelf || FinalJungle.activeSelf)) {
+            // FinalJungle.SetActive(false);
+            // FinalMain.SetActive(true);
+            // FinalWater.SetActive(false);
+            virtualWindow.transform.position = new Vector3(0, virtualWindow.transform.position.y, virtualWindow.transform.position.z);
+            currentCameraPos = new Vector3(-2, 3, 11);
+            lastCameraPos = currentCameraPos;
+            transform.localPosition = currentCameraPos; 
+
+            Debug.Log($"Current scene: main");
+	    }
+    }
+
+    void UpdateCameraPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
 
     /// Late Update. Hopefully by now the head position got updated by whatever you use as input here.
     void LateUpdate()
     {
         windowWidth = width;
         windowHeight = height;
-    // position changed
-    if (positionUpdated && isInitialized)
-    {
-        lock (this)
+        // position changed
+        if (positionUpdated && isInitialized)
         {
-            Vector3 UserMovement = currentUserPos - lastUserPos;
-            UserMovement *= 0.1f; // dampen the movement a bit
-            currentCameraPos = lastCameraPos + UserMovement;
-            transform.position = currentCameraPos; 
+            lock (this)
+            {
+                Vector3 UserMovement = currentUserPos - lastUserPos;
+                UserMovement *= 0.1f; // dampen the movement a bit
+                currentCameraPos = lastCameraPos + UserMovement;
+                transform.position = currentCameraPos; 
 
-            lastUserPos = currentUserPos; 
-            lastCameraPos = currentCameraPos;
+                lastUserPos = currentUserPos; 
+                lastCameraPos = currentCameraPos;
 
-            positionUpdated = false; 
+                positionUpdated = false; 
+            }
         }
-    }
         // gets the local position of this camera depending on the virtual screen
         Vector3 localPos = virtualWindow.transform.InverseTransformPoint(transform.position);
 
         setAsymmetricFrustum(GetComponent<Camera>(), localPos, GetComponent<Camera>().nearClipPlane);
-
     }
+
     /// <summary>
     /// Sets the asymmetric Frustum for the given virtual Window (at pos 0,0,0 )
     /// and the camera passed
@@ -214,6 +266,7 @@ public class AsymFrustum : MonoBehaviour
         m[3, 0] = 0; m[3, 1] = 0; m[3, 2] = e; m[3, 3] = 0;
         return m;
     }
+
     /// <summary>
     /// Draws gizmos in the Edit window.
     /// </summary>
@@ -243,6 +296,5 @@ public class AsymFrustum : MonoBehaviour
         Gizmos.DrawLine(transform.position, rightTop);
         Gizmos.DrawLine(transform.position, rightBottom);
         Gizmos.DrawLine(transform.position, leftBottom);
-
     }
 }

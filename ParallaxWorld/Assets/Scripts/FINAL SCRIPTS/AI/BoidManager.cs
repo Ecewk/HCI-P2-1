@@ -12,7 +12,7 @@ public class BoidManager : MonoBehaviour
 
     void Start()
     {
-        boids = FindObjectsOfType<Boid>();
+        boids = FindObjectsByType<Boid>(0);
         foreach (Boid b in boids)
         {
             b.Initialize(b.settings);
