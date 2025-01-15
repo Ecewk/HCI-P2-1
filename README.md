@@ -15,6 +15,11 @@ ParallaxWorld is a real-time human-computer interface that will help people rela
 
 ## Contributing
 Maria Fanou, John Fourlas, Hossam Gohar, Aleina Ismail, Ece Kaya, Dima Mykhalchyshen, Emily Kate Proctor & Mika Wauben (group HCI1)
+Sky asset: https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014
+Trees asset: https://assetstore.unity.com/packages/3d/vegetation/trees/tree-collection-pack-2017-76974
+Water asset: https://assetstore.unity.com/packages/vfx/shaders/aquas-lite-built-in-render-pipeline-53519
+Wolf asset:
+Goats asset:
 
 ## License
 MIT license
