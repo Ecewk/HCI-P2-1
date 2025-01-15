@@ -12,7 +12,7 @@ class eyeTrackerClass:
         # Initialize variables for smoothing
         self.last_x, self.last_y = 0, 0
         self.alpha = 0.2  # Smoothing factor
-        self.send_interval = 0.2  # Time interval to send data (in seconds)
+        self.send_interval = 0.02  # Time interval to send data (in seconds)
         self.last_send_time = time.time()
         global thissock
         thissock = sock
