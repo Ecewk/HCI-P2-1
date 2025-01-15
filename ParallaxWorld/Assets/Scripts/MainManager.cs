@@ -27,7 +27,6 @@ public class MainManager : MonoBehaviour
     void Start()
     {
         StartServer();
-        Debug.Log($"TESTTTT");
     }
 
     void StartServer()
@@ -124,8 +123,6 @@ public class MainManager : MonoBehaviour
         float speed = 0.5F;
         //cam.transform.RotateAround(target.transform.position, cam.transform.right, -Input.GetAxis("Mouse Y") * speed);
         //cam.transform.RotateAround(target.transform.position, cam.transform.up, -Input.GetAxis("Mouse X") * speed);
-        Debug.Log("Y     " + (currentUserPos.y - lastUserPos.y));
-        Debug.Log("X   " + (currentUserPos.x - lastUserPos.x));
         cam.transform.RotateAround(target.transform.position, cam.transform.right, (currentUserPos.y - lastUserPos.y)/10 * speed);
         cam.transform.RotateAround(target.transform.position, cam.transform.up, -(currentUserPos.x - lastUserPos.x)/10 * speed);
         lastUserPos = currentUserPos; 

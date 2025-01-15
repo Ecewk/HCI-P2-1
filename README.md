@@ -3,8 +3,9 @@ ParallaxWorld is a real-time human-computer interface that will help people rela
 
 ## Quick start:
 
-1. Download the project and open it with your IDE. 
+1. Clone the project and open it with your IDE. (If you download the zip file from github the assets will have to be downloaded manually).
 2. Make sure you have python (version 3.11 or higher) and unity (version 6000.0.26f1) installed.
+3. Write in the terminal 'pip install opencv-python mediapipe' and run this.
 3. Run the main.py file and make sure your webcam is working.
 4. Open 'ParallaxWorld' with Unity.
 5. Open and run the file 'Assets/Scenes/FinalWater.unity'
