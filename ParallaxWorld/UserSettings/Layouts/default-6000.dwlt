@@ -1016,7 +1016,7 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: -0.34494984, y: 0.007884257, z: -0.0028976353, w: -0.9385842}
   m_Size:
-    m_Target: 12.124355
+    m_Target: 55.366947
     speed: 2
     m_Value: 12.124355
   m_Ortho:
@@ -1265,7 +1265,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scenes/FINAL SCENES
+    - Assets/Scenes
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1284,7 +1284,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 72.400024}
     m_SelectedIDs: 3cc60000
     m_LastClickedID: 50748
-    m_ExpandedIDs: 
+    m_ExpandedIDs: 00000000aa820000ac820000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1313,7 +1313,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 
+    m_ExpandedIDs: 00000000aa820000ac820000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

@@ -6,68 +6,63 @@ global thissock
 
 class eyeTrackerClass:
     def __init__(self, sock) -> None:
-        # Load pre-trained classifier for detecting eyes
-        self.eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+        # Load pre-trained classifiers for detecting faces
+        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-        # Initialize variables for smoothing
+        # Initialize variables for smoothing and tracking
         self.last_x, self.last_y = 0, 0
+        self.last_sent_x, self.last_sent_y = None, None  # Last sent coordinates
         self.alpha = 0.2  # Smoothing factor
-        self.send_interval = 0.02  # Time interval to send data (in seconds)
+        self.send_interval = 0.0001  # Time interval to send data (in seconds)
         self.last_send_time = time.time()
+        self.change_threshold = 0.5  # Minimum change threshold for sending data
         global thissock
         thissock = sock
-    
-    def send_eyes_position(self, frame):
+
+    def send_position(self, frame):
         # Flip the frame horizontally to mirror it
         frame = cv2.flip(frame, 1)
 
-        # Convert frame to grayscale (necessary for eye detection)
+        # Convert frame to grayscale (necessary for detection)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Detect eyes in the frame
-        eyes = self.eye_cascade.detectMultiScale(gray, 1.3, 5)
+        # Detect faces in the frame
+        faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
-        if len(eyes) >= 2:  # Ensure at least two eyes are detected
-            eye_centers = []
-            z_values = []  # List to hold eye sizes for Z calculation
-            for (x, y, w, h) in eyes[:2]:  # Get only the first two eyes
-                eye_center_x = x + w // 2
-                eye_center_y = y + h // 2
-                eye_centers.append((eye_center_x, eye_center_y))
-                z_values.append(w * h)  # Use area as an estimate of distance
+        if len(faces) > 0:  # Ensure at least one face is detected
+            # Use the first detected face
+            (x, y, w, h) = faces[0]
 
-                # Draw a circle at the center of the detected eye
-                cv2.circle(frame, (eye_center_x, eye_center_y), 10, (0, 255, 0), 2)
-
-            # Calculate the average coordinates of the detected eyes
-            avg_x = sum(center[0] for center in eye_centers) // len(eye_centers)
-            avg_y = sum(center[1] for center in eye_centers) // len(eye_centers)
+            # Calculate the center of the detected face
+            face_center_x = x + w // 2
+            face_center_y = y + h // 2
 
             # Smooth the coordinates using a simple low-pass filter
-            smoothed_x = int(self.alpha * avg_x + (1 - self.alpha) * self.last_x)
-            smoothed_y = int(self.alpha * avg_y + (1 - self.alpha) * self.last_y)
+            smoothed_x = int(self.alpha * face_center_x + (1 - self.alpha) * self.last_x)
+            smoothed_y = int(self.alpha * face_center_y + (1 - self.alpha) * self.last_y)
 
             # Update last coordinates
             self.last_x, self.last_y = smoothed_x, smoothed_y
 
-            # Calculate Z based on eye sizes (smaller size means closer)
-                        # Calculate Z based on eye sizes (smaller size means closer)
-            #TODO: if z_values:
-            #     avg_size = sum(z_values) / len(z_values)
-            #             # Use a constant to scale the Z value
-            #     scale_factor = -100000  # Adjust this value as needed
-            #     z_value = 100 + scale_factor / avg_size  # Linear scaling
-            # else:
-            #     z_value = 0  # Default value if no eyes are detected
-
+            # Calculate Z based on face size (dummy value for now)
             z_value = 0
 
             # Invert Y coordinate
             inverted_y = 700 - smoothed_y
 
-            # Send the smoothed coordinates to the server at a fixed interval
-            if time.time() - self.last_send_time > self.send_interval:
-                data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
-                thissock.sendto(data.encode("utf-8"), ("127.0.0.1", 25001))
-                self.last_send_time = time.time()
-                    
+            # Check if the change in coordinates exceeds the threshold
+            if (self.last_sent_x is None or self.last_sent_y is None or
+                    abs(smoothed_x - self.last_sent_x) > self.change_threshold or
+                    abs(smoothed_y - self.last_sent_y) > self.change_threshold):
+
+                # Send the smoothed coordinates to the server at a fixed interval
+                if time.time() - self.last_send_time > self.send_interval:
+                    data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
+                    thissock.sendto(data.encode("utf-8"), ("127.0.0.1", 25001))
+                    self.last_send_time = time.time()
+
+                    # Update last sent coordinates
+                    self.last_sent_x, self.last_sent_y = smoothed_x, smoothed_y
+
+
+        cv2.waitKey(1)

@@ -23,7 +23,7 @@ if __name__ == "__main__":
             break
 
         myHandtracker.recog_gestures(img)
-        myEyetracker.send_eyes_position(img)
+        myEyetracker.send_position(img)
 
         #img = cv2.flip(img, 1)
         #cv2.imshow("Image", img)

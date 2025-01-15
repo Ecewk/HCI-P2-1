@@ -118,7 +118,7 @@ public class MainManager : MonoBehaviour
         }
         if ((Input.GetKeyDown(KeyCode.D) || SceneName == "water") && (SceneManager.GetActiveScene().name == "FinalMain")) {
             SceneManager.LoadScene("FinalWater");
-            target.transform.position = new Vector3(23.810009F,14.1315308F,-66.5497284F);
+            target.transform.position = new Vector3(-0.300000191F,13.7399998F,87.6999969F);
         }
 
         float speed = 0.5F;
