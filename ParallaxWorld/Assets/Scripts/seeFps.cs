@@ -4,12 +4,23 @@ using UnityEngine.UI;
 
 //to see the fps in the game
 public class showFPS : MonoBehaviour {
-	public Text fpsText;
-	public float deltaTime;
+	public TMPro.TextMeshProUGUI fpsText;
+	private float fps;
+	private string filePath = "fps.txt";
 
-	void Update () {
-		deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
-		float fps = 1.0f / deltaTime;
-		fpsText.text = Mathf.Ceil (fps).ToString ();
+
+	void Start () {
+		System.IO.File.AppendAllText(filePath,"-------------\n");
+		InvokeRepeating("GetFps", 1, 1);
+	}
+	void GetFps(){
+		fps = (int)(1f / Time.unscaledDeltaTime);
+		fpsText.text = "FPS: " + fps.ToString();
+		saveFps();
+
+	}
+	void saveFps(){
+		System.IO.File.AppendAllText(filePath, fps.ToString() + "\n");
+
 	}
 }
