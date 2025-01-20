@@ -23,7 +23,7 @@ class coordinateSenderClass:
         global thissock
         thissock = sock
 
-    def send_position(self,frame):
+    def send_position(self):
         inverted_y = 0
         smoothed_x = 0
         smoothed_y = 0

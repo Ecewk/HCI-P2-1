@@ -9,24 +9,26 @@ if __name__ == "__main__":
 
     # Initialize the TCP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #sock.sendto("jungle".encode("utf-8"), ("127.0.0.1", 25001))
 
     print("Start up hand tracking")
     myHandtracker = handTrackerClass(sock)
     print("Start up eye tracking")
     myEyetracker = coordinateSenderClass(sock)
+    
 
-    print("Start camera")
-    cap = cv2.VideoCapture(0)
+    a = True
+    b = True
     while True:
-        ret, img = cap.read()
-        if not ret:
-            break
-
-        #myHandtracker.recog_gestures(img)
-        myEyetracker.send_position(img)
-
-        img = cv2.flip(img, 1)
-        cv2.imshow("Image", img)
+        if a:
+            myHandtracker.recog_gestures()
+            a = False
+        elif b:
+            myHandtracker.send_jungle()
+            b = False
+        #myHandtracker.recog_gestures()
+        myEyetracker.send_position()
+        
         if (cv2.waitKey(1) & 0xFF == ord('q')):
             print("Exiting")
             exit()
