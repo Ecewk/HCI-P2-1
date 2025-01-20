@@ -1,5 +1,7 @@
 import cv2
 import socket
+import random
+import time
 from coordinateHandTracker import handTrackerClass
 from coordinateSender import coordinateSenderClass
 
@@ -17,18 +19,25 @@ if __name__ == "__main__":
     myEyetracker = coordinateSenderClass(sock)
     
 
-    a = False
-    b = False
-    while True:
-        if a:
-            myHandtracker.recog_gestures()
-            a = False
-        # elif b:
-        #     myHandtracker.send_jungle()
-        #     b = False
-        #myHandtracker.recog_gestures()
-        myEyetracker.send_position()
+    # a = False
+    # b = False
+    # while True:
+    #     if a:
+    #         myHandtracker.recog_gestures()
+    #         a = False
+    #     # elif b:
+    #     #     myHandtracker.send_jungle()
+    #     #     b = False
+    #     #myHandtracker.recog_gestures()
+    #     myEyetracker.send_position()
         
-        if (cv2.waitKey(1) & 0xFF == ord('q')):
-            print("Exiting")
-            exit()
+    #     if (cv2.waitKey(1) & 0xFF == ord('q')):
+    #         print("Exiting")
+    #         exit()
+    
+    #test for load tiemes
+    for _ in range(100):
+        message = random.choice(["main", "jungle", "water"])
+        sock.sendto(message.encode("utf-8"), (host, port))
+        print(f"Sent: {message}")
+        time.sleep(2)
