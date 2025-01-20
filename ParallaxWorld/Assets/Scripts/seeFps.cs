@@ -21,6 +21,5 @@ public class showFPS : MonoBehaviour {
 	}
 	void saveFps(){
 		System.IO.File.AppendAllText(filePath, fps.ToString() + "\n");
-
 	}
 }

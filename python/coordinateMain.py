@@ -1,7 +1,7 @@
 import cv2
 import socket
-from handTracker import handTrackerClass
-from eyeTracker import eyeTrackerClass
+from coordinateHandTracker import handTrackerClass
+from coordinateSender import coordinateSenderClass
 
 if __name__ == "__main__":
     # Host and port for the TCP connection
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     print("Start up hand tracking")
     myHandtracker = handTrackerClass(sock)
     print("Start up eye tracking")
-    myEyetracker = eyeTrackerClass(sock)
+    myEyetracker = coordinateSenderClass(sock)
 
     print("Start camera")
     cap = cv2.VideoCapture(0)
@@ -22,10 +22,11 @@ if __name__ == "__main__":
         if not ret:
             break
 
-        myHandtracker.recog_gestures(img)
+        #myHandtracker.recog_gestures(img)
         myEyetracker.send_position(img)
 
         img = cv2.flip(img, 1)
         cv2.imshow("Image", img)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        if (cv2.waitKey(1) & 0xFF == ord('q')):
+            print("Exiting")
+            exit()
