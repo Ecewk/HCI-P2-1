@@ -60,8 +60,8 @@ class eyeTrackerClass:
                 if time.time() - self.last_send_time > self.send_interval:
                     #############THIS IS WHERE YOU SEND THEM AND HAVE THE CURRENT COORDINATES
                     data = f"{smoothed_x},{inverted_y},{z_value}"  # Include z value
-                    with open("coordinates.txt", "a") as file:
-                        file.write(data + "\n")
+                    # with open("coordinates.txt", "a") as file:
+                    #     file.write(data + "\n")
                     thissock.sendto(data.encode("utf-8"), ("127.0.0.1", 25001))
                     self.last_send_time = time.time()
 

@@ -25,7 +25,7 @@ if __name__ == "__main__":
         myHandtracker.recog_gestures(img)
         myEyetracker.send_position(img)
 
-        img = cv2.flip(img, 1)
-        cv2.imshow("Image", img)
+        #img = cv2.flip(img, 1)
+        #cv2.imshow("Image", img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
