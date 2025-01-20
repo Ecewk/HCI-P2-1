@@ -23,9 +23,9 @@ if __name__ == "__main__":
         if a:
             myHandtracker.recog_gestures()
             a = False
-        elif b:
-            myHandtracker.send_jungle()
-            b = False
+        # elif b:
+        #     myHandtracker.send_jungle()
+        #     b = False
         #myHandtracker.recog_gestures()
         myEyetracker.send_position()
         
