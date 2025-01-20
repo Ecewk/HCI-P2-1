@@ -17,8 +17,8 @@ if __name__ == "__main__":
     myEyetracker = coordinateSenderClass(sock)
     
 
-    a = True
-    b = True
+    a = False
+    b = False
     while True:
         if a:
             myHandtracker.recog_gestures()
