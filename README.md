@@ -19,8 +19,8 @@ Maria Fanou, John Fourlas, Hossam Gohar, Aleina Ismail, Ece Kaya, Dima Mykhalchy
 Sky asset: https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014
 Trees asset: https://assetstore.unity.com/packages/3d/vegetation/trees/tree-collection-pack-2017-76974
 Water asset: https://assetstore.unity.com/packages/vfx/shaders/aquas-lite-built-in-render-pipeline-53519
-Wolf asset:
-Goats asset:
+Wolf asset: https://www.cgtrader.com/free-3d-models/animals/mammal/wolf-3d-model-free-download
+Goats asset: https://www.cgtrader.com/free-3d-models/animals/mammal/goat-animal-6ad2353f-bed5-49e1-bb2c-59706986df7e
 
 ## License
 MIT license
