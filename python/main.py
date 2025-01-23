@@ -4,10 +4,10 @@ from handTracker import handTrackerClass
 from eyeTracker import eyeTrackerClass
 
 if __name__ == "__main__":    
-    # Host and port for the TCP connection
+    # Host and port for the UDP connection
     host, port = "127.0.0.1", 25001
 
-    # Initialize the TCP socket
+    # Initialize the UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     print("Start up hand tracking")
